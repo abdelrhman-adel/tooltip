@@ -5,10 +5,13 @@ const {
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./lib/index.ts",
+  entry: {
+    library: "./lib/index.ts",
+    demo: "./demo/main.ts"
+  },
   output: {
     path: path.resolve(__dirname, "../public"),
-    filename: "library.bundle.js"
+    filename: "[name].bundle.[hash].js"
   },
   module: {
     rules: [{ test: /\.tsx?$/, use: "ts-loader" }]

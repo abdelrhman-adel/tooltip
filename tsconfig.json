@@ -8,5 +8,5 @@
     "preserveConstEnums": true,
     "outDir": "public"
   },
-  "include": ["lib/**/*"]
+  "include": ["lib/**/*", "demo/**/*"]
 }
