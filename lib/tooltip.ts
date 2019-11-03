@@ -1,11 +1,24 @@
 import { ITooltip, TooltipConfig } from "./types";
+import { defaultCommonConfig } from "./defaults";
 
 export class Tooltip implements ITooltip {
+  private config: TooltipConfig;
   private tooltipElement: HTMLElement;
   private hideCallback: (e: MouseEvent) => void;
-  constructor(private config: TooltipConfig) {
-    this.create();
-    this.attachHideEvent();
+  constructor(config: TooltipConfig) {
+    if (config.element && config.description) {
+      this.prepareConfig(config);
+      this.create();
+      this.attachHideEvent();
+    }
+  }
+
+  private prepareConfig(config: TooltipConfig) {
+    this.config = {
+      ...defaultCommonConfig,
+      ...config
+    };
+    this.config.callbacks = this.config.callbacks || {};
   }
   private create() {
     this.createTooltipElement();
@@ -29,7 +42,7 @@ export class Tooltip implements ITooltip {
     } = this.config;
     this.hideCallback = () => {
       this.destroy();
-      onHide();
+      onHide && onHide();
     };
     element.addEventListener(outTrigger, this.hideCallback);
   }

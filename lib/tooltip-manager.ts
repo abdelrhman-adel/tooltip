@@ -1,6 +1,6 @@
-import { ITooltipManager, TooltipGlobalConfig } from "./types";
+import { ITooltipManager, TooltipConfig, TooltipGlobalConfig } from "./types";
 import { Tooltip } from "./tooltip";
-import { defaultConfig } from "./defaults";
+import { defaultGlobalConfig } from "./defaults";
 
 export class TooltipManager implements ITooltipManager {
   private config: TooltipGlobalConfig;
@@ -12,7 +12,7 @@ export class TooltipManager implements ITooltipManager {
   }
   private prepareConfig(config: Partial<TooltipGlobalConfig>) {
     this.config = {
-      ...defaultConfig,
+      ...defaultGlobalConfig,
       ...config
     };
   }
@@ -25,17 +25,14 @@ export class TooltipManager implements ITooltipManager {
       inTrigger,
       selectors,
       descriptionAttr,
-      openDelay,
       ...tooltipCommonConfig
     } = this.config;
     this.openCallback = (e: MouseEvent) => {
       const element = this.generateMatchingElements(selectors).find(
         el => el === e.target
       );
-      if (element && !this.tooltipsMap.has(element)) {
-        const description = element.getAttribute(descriptionAttr);
-        if (description) {
-        }
+      const description = element && element.getAttribute(descriptionAttr);
+      if (element && description && !this.tooltipsMap.has(element)) {
         this.tooltipsMap.set(
           element,
           new Tooltip({
@@ -70,7 +67,23 @@ export class TooltipManager implements ITooltipManager {
     return inTrigger === "mouseenter" ? "mousemove" : inTrigger;
   }
 
-  public destroy() {
+  public show(config: TooltipConfig): HTMLElement {
+    const { element, description } = config;
+    if (element && description && !this.tooltipsMap.has(element)) {
+      this.tooltipsMap.set(element, new Tooltip(config));
+    }
+    return element;
+  }
+
+  public hide(element: HTMLElement): void {
+    const tooltip: Tooltip = this.tooltipsMap.get(element);
+    if (tooltip) {
+      tooltip.destroy();
+      this.tooltipsMap.delete(element);
+    }
+  }
+
+  public destroy(): void {
     [...this.tooltipsMap.values()].forEach(tooltip => tooltip.destroy());
     this.tooltipsMap.clear();
     window.removeEventListener(this.getInTrigger(), this.openCallback);
