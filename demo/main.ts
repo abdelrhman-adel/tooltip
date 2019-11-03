@@ -1,6 +1,6 @@
 import { TooltipManager } from "../lib";
 
-const manager = new TooltipManager();
+const manager = new TooltipManager({openDelay: 1000});
 
 // manually display a tooltip
 let manualTooltip: HTMLElement;

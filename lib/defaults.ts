@@ -2,8 +2,6 @@ import { CommonConfig, TooltipGlobalConfig } from "./types";
 
 export const defaultCommonConfig: CommonConfig = {
   outTrigger: "mouseleave",
-  openDelay: 0,
-  hideDelay: 0,
   placement: "top",
   canHover: false,
   additionalClass: ""

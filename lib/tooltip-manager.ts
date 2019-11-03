@@ -5,6 +5,7 @@ import { defaultGlobalConfig } from "./defaults";
 export class TooltipManager implements ITooltipManager {
   private config: TooltipGlobalConfig;
   private tooltipsMap: Map<HTMLElement, Tooltip> = new Map();
+  private pendingElements: Set<HTMLElement> = new Set();
   private openCallback: (e: MouseEvent) => void;
   constructor(config?: Partial<TooltipGlobalConfig>) {
     this.prepareConfig(config || {});
@@ -25,6 +26,8 @@ export class TooltipManager implements ITooltipManager {
       inTrigger,
       selectors,
       descriptionAttr,
+      openDelay,
+      outTrigger,
       ...tooltipCommonConfig
     } = this.config;
     this.openCallback = (e: MouseEvent) => {
@@ -32,16 +35,34 @@ export class TooltipManager implements ITooltipManager {
         el => el === e.target
       );
       const description = element && element.getAttribute(descriptionAttr);
-      if (element && description && !this.tooltipsMap.has(element)) {
-        this.tooltipsMap.set(
-          element,
-          new Tooltip({
+      if (
+        element &&
+        !this.pendingElements.has(element) &&
+        !this.tooltipsMap.has(element) &&
+        description
+      ) {
+        this.pendingElements.add(element);
+        const timeout = setTimeout(() => {
+          this.tooltipsMap.set(
             element,
-            description,
-            ...tooltipCommonConfig,
-            callbacks: { onHide: this.onHide(element) }
-          })
-        );
+            new Tooltip({
+              element,
+              description,
+              outTrigger,
+              ...tooltipCommonConfig,
+              callbacks: { onHide: this.onHide(element) }
+            })
+          );
+          this.pendingElements.delete(element);
+        }, openDelay || 0);
+        if (openDelay) {
+          const clearFn = () => {
+            clearTimeout(timeout);
+            this.pendingElements.delete(element);
+            element.removeEventListener(outTrigger, clearFn);
+          };
+          element.addEventListener(outTrigger, clearFn);
+        }
       }
     };
 
