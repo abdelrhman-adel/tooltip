@@ -1,6 +1,4 @@
 /**
  * an entry point to your styles, use import to import other files here, try to avoid writing code to this file
  */
-body {
-  color: red
-}
+@import "./tooltip";

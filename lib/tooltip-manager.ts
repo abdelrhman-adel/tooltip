@@ -91,7 +91,7 @@ export class TooltipManager implements ITooltipManager {
   public show(config: TooltipConfig): HTMLElement {
     const { element, description } = config;
     if (element && description && !this.tooltipsMap.has(element)) {
-      this.tooltipsMap.set(element, new Tooltip(config));
+      this.tooltipsMap.set(element, new Tooltip(config, true));
     }
     return element;
   }
