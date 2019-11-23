@@ -23,13 +23,12 @@ export class TooltipManager implements ITooltipManager {
 
   private attachOpenEvents() {
     const {
-      inTrigger,
       selectors,
       descriptionAttr,
       openDelay,
-      outTrigger,
       ...tooltipCommonConfig
     } = this.config;
+    const { outTrigger} = tooltipCommonConfig;
     this.openCallback = (e: MouseEvent) => {
       const element = this.generateMatchingElements(selectors).find(
         el => el === e.target
@@ -48,7 +47,6 @@ export class TooltipManager implements ITooltipManager {
             new Tooltip({
               element,
               description,
-              outTrigger,
               ...tooltipCommonConfig,
               callbacks: { onHide: this.onHide(element) }
             })

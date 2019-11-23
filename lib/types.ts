@@ -4,6 +4,7 @@ export type OutTrigger = "mouseleave" | "click";
 export interface CommonConfig {
   // tooltip placement either on top or bottom of element
   placement?: "top" | "bottom";
+  inTrigger?: InTrigger;
   outTrigger?: OutTrigger;
   openDelay?: number;
   hideDelay?: number;
@@ -13,7 +14,6 @@ export interface CommonConfig {
 export interface TooltipGlobalConfig extends CommonConfig {
   selectors: string | string[];
   descriptionAttr: string;
-  inTrigger: InTrigger;
 }
 
 export interface TooltipConfig extends CommonConfig {

@@ -4,7 +4,8 @@ import { defaultCommonConfig } from "./defaults";
 export class Tooltip implements ITooltip {
   private config: TooltipConfig;
   private tooltipElement: HTMLElement;
-  private hideCallback: (e: MouseEvent) => void;
+  private hideCallbacks: Map<HTMLElement, (e: MouseEvent) => void> = new Map();
+  private timeouts: Map<HTMLElement, number> = new Map();
   constructor(config: TooltipConfig, private isManual?: boolean) {
     if (config.element && config.description) {
       this.prepareConfig(config);
@@ -69,30 +70,57 @@ export class Tooltip implements ITooltip {
 
   private attachHideEvent() {
     const {
+      inTrigger,
       outTrigger,
       element,
-        canHover,
+      canHover,
+      hideDelay,
       callbacks: { onHide }
     } = this.config;
     if (!this.isManual) {
-      this.hideCallback = ({relatedTarget }: MouseEvent) => {
-        if(canHover && relatedTarget === this.tooltipElement){
+      const hideCallbackFn = (el: HTMLElement) => ({
+        relatedTarget
+      }: MouseEvent) => {
+        if (canHover && relatedTarget === this.tooltipElement) {
           return;
         }
-        this.destroy();
-        onHide && onHide();
+        this.setTimeout(
+          el,
+          () => {
+            this.destroy();
+            onHide && onHide();
+          },
+          hideDelay || 0
+        );
+        if (hideDelay) {
+          const clearFn = () => {
+            this.clearTimeout();
+            el.removeEventListener(inTrigger, clearFn);
+          };
+          el.addEventListener(inTrigger, clearFn);
+        }
       };
-      [element, this.tooltipElement].forEach(el =>
-        el.addEventListener(outTrigger, this.hideCallback)
-      );
+      [element, this.tooltipElement].forEach(el => {
+        const fn = hideCallbackFn(el);
+        this.hideCallbacks.set(el, fn);
+        el.addEventListener(outTrigger, fn);
+      });
     }
+  }
+  private setTimeout(el: HTMLElement, fn: () => void, time: number) {
+    this.clearTimeout();
+    this.timeouts.set(el, window.setTimeout(fn, time));
+  }
+  private clearTimeout() {
+    this.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.timeouts.clear();
   }
 
   public destroy() {
     if (!this.isManual) {
-      const { outTrigger, element } = this.config;
-      [element, this.tooltipElement].forEach(el =>
-        el.removeEventListener(outTrigger, this.hideCallback)
+      const { outTrigger } = this.config;
+      this.hideCallbacks.forEach((fn, el) =>
+        el.removeEventListener(outTrigger, fn)
       );
     }
     document.body.removeChild(this.tooltipElement);

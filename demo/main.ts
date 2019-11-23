@@ -1,8 +1,9 @@
 import "./demo.scss";
-import { TooltipManager } from "../lib";
+import {TooltipManager} from "../lib";
 
 const manager = new TooltipManager({
   openDelay: 1000,
+  hideDelay: 1000,
   canHover: true,
   placement: "bottom"
 });
