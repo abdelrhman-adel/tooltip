@@ -19,7 +19,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "library.bundle.css"
+      filename: "[name].bundle.[hash].css"
     })
   ],
   mode: "production"

@@ -26,7 +26,8 @@ export class Tooltip implements ITooltip {
   }
 
   private createTooltipElement() {
-    const textNode = document.createTextNode(this.config.description);
+    const { description, placement, additionalClass } = this.config;
+    const textNode = document.createTextNode(description);
 
     const tooltipEl = document.createElement("div");
     tooltipEl.classList.add("tooltip");
@@ -35,7 +36,8 @@ export class Tooltip implements ITooltip {
     this.tooltipElement = document.createElement("div");
     this.tooltipElement.classList.add(
       "tooltip-container",
-      `tooltip-${this.config.placement}`
+      `tooltip-${placement}`,
+      additionalClass
     );
     this.tooltipElement.appendChild(tooltipEl);
 
