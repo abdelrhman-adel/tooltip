@@ -22,18 +22,26 @@ export class Tooltip implements ITooltip {
   }
   private create() {
     this.createTooltipElement();
-    console.log("created", this.config);
   }
 
   private createTooltipElement() {
+    const textNode = document.createTextNode(this.config.description);
+
+    const tooltipEl = document.createElement("div");
+    tooltipEl.classList.add("tooltip");
+    tooltipEl.appendChild(textNode);
+
     this.tooltipElement = document.createElement("div");
     this.tooltipElement.classList.add(
-      "tooltip",
-      `tooltip--${this.config.placement}`
+      "tooltip-container",
+      `tooltip-${this.config.placement}`
     );
-    this.tooltipElement.appendChild(
-      document.createTextNode(this.config.description)
-    );
+    this.tooltipElement.appendChild(tooltipEl);
+
+    this.show();
+  }
+
+  private show() {
     this.tooltipElement.style.top = "-999999px";
     this.tooltipElement.style.left = "-999999px";
     document.body.appendChild(this.tooltipElement);
@@ -63,23 +71,30 @@ export class Tooltip implements ITooltip {
     const {
       outTrigger,
       element,
+        canHover,
       callbacks: { onHide }
     } = this.config;
     if (!this.isManual) {
-      this.hideCallback = () => {
+      this.hideCallback = ({relatedTarget }: MouseEvent) => {
+        if(canHover && relatedTarget === this.tooltipElement){
+          return;
+        }
         this.destroy();
         onHide && onHide();
       };
-      element.addEventListener(outTrigger, this.hideCallback);
+      [element, this.tooltipElement].forEach(el =>
+        el.addEventListener(outTrigger, this.hideCallback)
+      );
     }
   }
 
   public destroy() {
-    document.body.removeChild(this.tooltipElement);
     if (!this.isManual) {
       const { outTrigger, element } = this.config;
-      element.removeEventListener(outTrigger, this.hideCallback);
+      [element, this.tooltipElement].forEach(el =>
+        el.removeEventListener(outTrigger, this.hideCallback)
+      );
     }
-    console.log("destroyed", this.config);
+    document.body.removeChild(this.tooltipElement);
   }
 }

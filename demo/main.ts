@@ -1,7 +1,11 @@
-import './demo.scss'
+import "./demo.scss";
 import { TooltipManager } from "../lib";
 
-const manager = new TooltipManager({ openDelay: 1000, placement: "bottom" });
+const manager = new TooltipManager({
+  openDelay: 1000,
+  canHover: true,
+  placement: "bottom"
+});
 
 // manually display a tooltip
 let manualTooltip: HTMLElement;
@@ -12,7 +16,7 @@ document.querySelector("[toggle-tooltip]").addEventListener("click", () => {
   } else {
     manualTooltip = manager.show({
       element: document.querySelector("[with-manual-tooltip]"),
-      description: "manual tooltip",
+      description: "manual tooltip"
     });
   }
 });

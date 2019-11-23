@@ -3,31 +3,32 @@
   color: #000;
   border-radius: 3px;
   border: 1px gray solid;
-  display: inline-block;
   padding: 5px 10px;
-  position: absolute;
-  transform: translateX(-50%);
-  &:before{
-    content: '';
-    width: 0;
-    height: 0;
-    border-right: 5px transparent solid;
-    border-left: 5px transparent solid;
+  &-container{
     position: absolute;
-    left: 50%;
     transform: translateX(-50%);
-  }
-  &--top{
-    margin-top: -5px;
     &:before{
-      bottom: -5px;
+      content: '';
+      width: 0;
+      height: 0;
+      border-right: 5px transparent solid;
+      border-left: 5px transparent solid;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  &-container#{&}-top{
+    padding-bottom: 5px;
+    &:before{
+      bottom: 0;
       border-top: 5px gray solid;
     }
   }
-  &--bottom{
-    margin-top: 5px;
+  &-container#{&}-bottom{
+    padding-top: 5px;
     &:before{
-      top: -5px;
+      top: 0;
       border-bottom: 5px gray solid;
     }
   }
